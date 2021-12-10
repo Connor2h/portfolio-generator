@@ -1,11 +1,10 @@
-// const profileDataArgs = process.argv.slice(2, process.argv.length);
-// console.log(profileDataArgs);
+
 
 const inquirer = require('inquirer');
 
-const fs = require('fs');//The fs module enables interacting with the file system in a way modeled on standard POSIX functions.
-
 const generatePage = require('./src/page-template.js');//creating link to page-template to call the generatePage function in the page-template.js file
+
+const { writeFile, copyFile } = require('./utils/generate-site');
 
 const promptUser = () => {
     return inquirer.prompt([
@@ -188,27 +187,18 @@ const promptProject = (portfolioData) => {
 promptUser()
     .then(promptProject)
     .then(portfolioData => {
-        const pageHTML = generatePage(portfolioData);
-
-        fs.writeFile('./index.html', pageHTML, err => {
-        if (err) throw new Error(err);
-
-        console.log('Page created! Check out index.html in this directory to see it!');
-    });
+        return generatePage(portfolioData);
+    })
+    .then(pageHTML => {
+        return writeFile(pageHTML);
+    })
+    .then(writeFileResponse => {
+    console.log(writeFileResponse);
+        return copyFile();
+    })
+    .then(copyFileResponse => {
+        console.log(copyFileResponse);
+    })
+    .catch(err => {
+        console.log(err);
 });
-
-
-
-// const pageHTML = generatePage(name, github);
-
-// console.log(pageHTML);
-
-// // const name = profileDataArgs[0];
-// // const github = profileDataArgs[1];
-// //const [name, github] = profileDataArgs;//this does the same as the above two lines
-
-// fs.writeFile('./index.html', pageHTML, err => {
-//     if (err) throw err;// if error then throw the error
-
-//     console.log('Portfolio complete! Check out index.html to see the output!');
-// });
